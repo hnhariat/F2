@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    tools:context="sun.toy.SwipeViewActivity">
+
+    <RelativeLayout
+        android:id="@+id/view_header"
+        android:layout_width="match_parent"
+        android:layout_height="192dp"
+        android:background="@color/colorPrimaryDark"></RelativeLayout>
+
+    <com.sun.toy.ux.widget.CustomViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:clipToPadding="false"/>
+
+</RelativeLayout>
