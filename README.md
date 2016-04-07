@@ -18,7 +18,7 @@
 3. 대화중 다른 대화방으로의 이동과 같이 빠른 화면 전환이 필요한 ui
 
 #화면
-<img src="./screenshots/f2_3.gif" width="240">
+<img src="./screenshots/f2_gif.gif" width="240">
 
 #Licence
 Copyright 2016 Bang Sunje
