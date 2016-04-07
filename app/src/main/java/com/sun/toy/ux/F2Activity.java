@@ -1,5 +1,6 @@
 package com.sun.toy.ux;
 
+import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,7 @@ public class F2Activity extends ToyAppCompatActivity implements CustomViewPager.
     private int mPageMargin = 20;
     private int mDraggableMaxHeight;
     private int prevPadding = 0;
+    private int mHeaderHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,7 @@ public class F2Activity extends ToyAppCompatActivity implements CustomViewPager.
 
         mPageMaxWidth = Consts.getScreenWidth(this);
         mDraggableMaxHeight = Consts.dip2px(this, 214);
+        mHeaderHeight = Consts.dip2px(this, 192);
         mPageMargin = Consts.dip2px(getApplicationContext(), 10);
     }
 
@@ -102,6 +105,12 @@ public class F2Activity extends ToyAppCompatActivity implements CustomViewPager.
     @TargetApi(11)
     @Override
     public void onDragY(float dy) {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) pager.getLayoutParams();
+        if (params.topMargin == 0) {
+            // first
+            setPageFormation();
+        }
+
         Log.d("viewpager.drag", "y : " + dy);
 
         int from = 0, to = 0;
@@ -110,14 +119,7 @@ public class F2Activity extends ToyAppCompatActivity implements CustomViewPager.
         } else {
             from = mPagerInitialPadding;
         }
-//        ValueAnimator anim = ValueAnimator.ofInt(from, to);
-//        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator animation) {
-//                int value = (int) animation.getAnimatedValue();
-//                Log.d("hatti.View.animation.value", "vale : " + value);
 
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) pager.getLayoutParams();
         params.topMargin += (int) dy;
 
         if (params.topMargin >= mDraggableMaxHeight) {
@@ -134,48 +136,119 @@ public class F2Activity extends ToyAppCompatActivity implements CustomViewPager.
 
     @TargetApi(11)
     @Override
+    public void onDragEnd() {
+        Log.d("asdlfj", "enc drag");
+        final RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) pager.getLayoutParams();
+        final int from = params.topMargin;
+        int to = 0;
+        if (from == mHeaderHeight) {
+            // select
+            to = 0;
+        } else if (params.topMargin > mHeaderHeight / 2) {
+            // 일정거리 이상 이동
+            to = mHeaderHeight;
+        } else {
+            to = 0;
+        }
+        Log.d("sldfjsldfj", "params.topMargin : " + params.topMargin + " mDraggableMaxHeight * 0.8f : " + mHeaderHeight * 0.8f + " " +
+                "mDraggableMaxHeight : " + mHeaderHeight);
+        ValueAnimator anim = ValueAnimator.ofInt(from, to);
+
+        final int finalTo = to;
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int value = (int) animation.getAnimatedValue();
+                params.topMargin = value;
+
+                int padding = getWidthPadding(from == 0 ? 1 : 0, params.topMargin);
+
+                pager.setPadding(padding, 0, padding, 0);
+                pager.scrollBy((prevPadding - padding) * pager.getCurrentItem() * 2, 0);
+                Log.d("view.pager.drag.end", "prevPadding : " + prevPadding + " | padding : " + padding + " | page : " + pager.getCurrentItem());
+                prevPadding = padding;
+                pager.setLayoutParams(params);
+
+                if (value == finalTo && finalTo == 0) {
+                    setPagingEnable(true);
+                } else {
+                    setPagingEnable(false);
+                }
+            }
+        });
+        anim.setDuration(200);
+        anim.start();
+    }
+
+    private void setPagingEnable(boolean enable) {
+        pager.setPagingEnable(enable);
+    }
+
+    private void setPageFormation() {
+        for (int i = 0; i < pager.getChildCount(); i++) {
+
+            View page = pager.getChildAt(i);
+
+            int pageWidth = pager.getMeasuredWidth() - pager.getPaddingLeft() - pager.getPaddingRight();
+            int pageHeight = pager.getHeight();
+            int paddingLeft = pager.getPaddingLeft();
+            float transformPos = (float) (page.getLeft() - (pager.getScrollX() + paddingLeft)) / pageWidth;
+
+            final float normalizedposition = Math.abs(Math.abs(transformPos) - 1);
+            page.setAlpha(normalizedposition + 0.5f);
+
+            int max = -pageHeight / 10;
+
+                /* Check http://stackoverflow.com/questions/32384789/android-viewpager-smooth-transition-for-this-design
+                   for other ways to do this.
+                */
+            if (transformPos < -1) { // [-Infinity,-1)
+                // This page is way off-screen to the left.
+//                    page.setTranslationY(0);
+                page.setTranslationY(max);
+            } else if (transformPos <= 1) { // [-1,1]
+//                    page.setTranslationY(0);
+                page.setTranslationY(max * (Math.abs(transformPos)));
+            } else if (transformPos <= 0) { // (1,+Infinity]
+                // This page is way off-screen to the right.
+//                    page.setTranslationY(80);
+                page.setTranslationY(max * (1 - Math.abs(transformPos)));
+            } else {
+                page.setTranslationY(max);
+            }
+        }
+    }
+
+    @TargetApi(11)
+    @Override
     public void onPagerWidth(final int position) {
         super.onPagerWidth(position);
-        int from = 0, to = 0;
-        boolean isBig = false;
-        if (pager.getPaddingLeft() != mPagerInitialPadding) {
-            to = mPagerInitialPadding;
-            isBig = true;
-            pager.requestDisallowInterceptTouchEvent(true);
-        } else {
-            from = mPagerInitialPadding;
-            pager.requestDisallowInterceptTouchEvent(false);
-        }
-        Log.d("viewpager.values", "from : " + from + " , " + "to : " + to + " pager.getScrollX();" + pager.getScrollX());
-//        ValueAnimator anim = ValueAnimator.ofInt(from, to);
-//        final int finalTo = to;
-//
-//        final int finalTo1 = to;
-////        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-////            @Override
-////            public void onAnimationUpdate(ValueAnimator animation) {
-////                int value = (int) animation.getAnimatedValue();
-////                Log.d("hatti.View.animation.value", "vale : " + value);
-////                pager.setPadding(value, 0, value, 0);
-//        final int finalTo2 = to;
-////        pager.post(new Runnable() {
-////            @Override
-////            public void run() {
-//        pager.setPadding(finalTo2, 0, finalTo2, 0);
-//        pager.setCurrentItem(position, false);
-//        if (finalTo == 0) {
-////            pager.scrollBy(mPagerInitialPadding * (2 * position), 0);
-////            if (position > 0) {
-//            pager.scrollTo(mPageMaxWidth * position, 0);
-////            } else {
-////                pager.scrollTo(0, 0);
-////            }
+//        int from = 0, to = 0;
+//        boolean isBig = false;
+//        if (pager.getPaddingLeft() != mPagerInitialPadding) {
+//            to = mPagerInitialPadding;
+//            isBig = true;
+//            pager.requestDisallowInterceptTouchEvent(true);
 //        } else {
-//            pager.scrollTo(mPageMinWidth * position, 0);
-////            pager.scrollBy(-mPagerInitialPadding * (2 * position), 0);
+//            from = mPagerInitialPadding;
+//            pager.requestDisallowInterceptTouchEvent(false);
 //        }
-////            }
-////        });
+//        if (isBig) {
+//            return;
+//        }
+//        Log.d("viewpager.values", "from : " + from + " , " + "to : " + to + " pager.getScrollX();" + pager.getScrollX());
+//        ValueAnimator anim = ValueAnimator.ofInt(from, to);
+//
+//        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            int prevPadding = 0;
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator animation) {
+//                int value = (int) animation.getAnimatedValue();
+//                pager.setPadding(value, 0, value, 0);
+//                pager.scrollBy((prevPadding - value) * pager.getCurrentItem() * 2, 0);
+//                prevPadding = value;
+//            }
+//        });
 //
 ////        if (position > 0) {
 ////            pager.postDelayed(new Runnable() {
@@ -216,6 +289,6 @@ public class F2Activity extends ToyAppCompatActivity implements CustomViewPager.
 //        });
 //        anim2.start();
 ////        Toast.makeText(SwipeViewActivity.this, position + "", 0).show();
-
+//
     }
 }

@@ -10,8 +10,18 @@
     <RelativeLayout
         android:id="@+id/view_header"
         android:layout_width="match_parent"
-        android:layout_height="192dp"
-        android:background="@color/colorPrimaryDark"></RelativeLayout>
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="192dp"
+            android:gravity="center"
+            android:text="welcome!"
+            android:textColor="#ffffff"
+            android:textSize="24dp"
+            android:textStyle="bold"/>
+    </RelativeLayout>
 
     <com.sun.toy.ux.widget.CustomViewPager
         android:id="@+id/pager"

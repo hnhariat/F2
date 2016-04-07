@@ -121,8 +121,13 @@ public class CustomViewPager extends ViewGroup {
 	private int mExpectedAdapterCount;
     private float mInitialMotionRawY;
     private float mLastMotionRawY;
+	private boolean pagingEnable;
 
-    static class ItemInfo {
+	public void setPagingEnable(boolean pagingEnable) {
+		this.pagingEnable = pagingEnable;
+	}
+
+	static class ItemInfo {
 		Object object;
 		int position;
 		boolean scrolling;
@@ -358,6 +363,7 @@ public class CustomViewPager extends ViewGroup {
 	interface Decor {}
     public interface OnTouchDeliver {
         void onDragY(float delta);
+		void onDragEnd();
     }
 
     OnTouchDeliver deliver;
@@ -1892,6 +1898,7 @@ public class CustomViewPager extends ViewGroup {
          * scrolling there.
          */
 
+
 		final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
         Log.i("asdfasdf", "sdlfjsd : " + ev.getY());
         if (mIsUnableToDrag) {
@@ -1909,10 +1916,12 @@ public class CustomViewPager extends ViewGroup {
 			mIsBeingDragged = false;
 			mIsUnableToDrag = false;
 			mActivePointerId = INVALID_POINTER;
+            mVelocityTracker.computeCurrentVelocity(1000);
 			if (mVelocityTracker != null) {
 				mVelocityTracker.recycle();
 				mVelocityTracker = null;
 			}
+			deliver.onDragEnd();
 			return false;
 		}
 
@@ -2140,9 +2149,15 @@ public class CustomViewPager extends ViewGroup {
 					setCurrentItemInternal(nextPage, true, true, initialVelocity);
 
 					mActivePointerId = INVALID_POINTER;
+
 					endDrag();
 					needsInvalidate = mLeftEdge.onRelease() | mRightEdge.onRelease();
 				}
+				final VelocityTracker velocityTracker = mVelocityTracker;
+				velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+				int initialVelocity = (int) VelocityTrackerCompat.getXVelocity(
+						velocityTracker, mActivePointerId);
+				Log.d("sdfjsldfjsdlfj", initialVelocity + "");
 				break;
 			case MotionEvent.ACTION_CANCEL:
 				if (mIsBeingDragged) {
