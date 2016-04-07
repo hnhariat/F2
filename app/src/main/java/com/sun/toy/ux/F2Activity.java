@@ -2,10 +2,13 @@ package com.sun.toy.ux;
 
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.sun.toy.ux.adapters.AdapterFrgSimple;
 import com.sun.toy.ux.utils.Consts;
@@ -22,6 +25,11 @@ public class F2Activity extends ToyAppCompatActivity implements CustomViewPager.
     private int mDraggableMaxHeight;
     private int prevPadding = 0;
     private int mHeaderHeight;
+    private TextView txtHeader;
+    private ImageView imgHeader;
+
+    Matrix matrix = new Matrix();
+    Matrix savedMatrix = new Matrix();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,9 @@ public class F2Activity extends ToyAppCompatActivity implements CustomViewPager.
         pager = (CustomViewPager) findViewById(R.id.pager);
         pager.setOnTouchDeliver(this);
 
+        txtHeader = (TextView) findViewById(R.id.txt);
+        imgHeader = (ImageView) findViewById(R.id.img);
+        imgHeader.setScaleType(ImageView.ScaleType.MATRIX);
         mPagerInitialPadding = getResources().getDimensionPixelSize(R.dimen.page_padding);
         mPageMinWidth = mPageMaxWidth - mPagerInitialPadding * 2;
 
@@ -87,6 +98,24 @@ public class F2Activity extends ToyAppCompatActivity implements CustomViewPager.
                 }
             }
         });
+
+        pager.addOnPageChangeListener(new CustomViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                txtHeader.setText(((FrgSimpleList)adapter.getItem(position)).getTitle()+ "");
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        pager.setCurrentItem(0);
     }
 
     private int getCorrectScrollX(int direction, int width, int topMargin) {
@@ -132,6 +161,16 @@ public class F2Activity extends ToyAppCompatActivity implements CustomViewPager.
         pager.setPadding(padding, 0, padding, 0);
         pager.scrollBy((prevPadding - padding) * pager.getCurrentItem() * 2, 0);
         prevPadding = padding;
+
+        scaleHeader(params.topMargin / (float) mDraggableMaxHeight);
+    }
+
+    private void scaleHeader(float ratio) {
+        int w = imgHeader.getDrawable().getIntrinsicWidth();
+        int h = imgHeader.getDrawable().getIntrinsicHeight();
+        matrix.setScale(1f + ratio, 1f + ratio, w/2, h/2);
+        imgHeader.setImageMatrix(matrix);
+        imgHeader.invalidate();
     }
 
     @TargetApi(11)

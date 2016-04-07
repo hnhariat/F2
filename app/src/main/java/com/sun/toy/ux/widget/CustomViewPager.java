@@ -2153,11 +2153,11 @@ public class CustomViewPager extends ViewGroup {
 					endDrag();
 					needsInvalidate = mLeftEdge.onRelease() | mRightEdge.onRelease();
 				}
-				final VelocityTracker velocityTracker = mVelocityTracker;
-				velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-				int initialVelocity = (int) VelocityTrackerCompat.getXVelocity(
-						velocityTracker, mActivePointerId);
-				Log.d("sdfjsldfjsdlfj", initialVelocity + "");
+//				final VelocityTracker velocityTracker = mVelocityTracker;
+//				velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+//				int initialVelocity = (int) VelocityTrackerCompat.getXVelocity(
+//						velocityTracker, mActivePointerId);
+//				Log.d("sdfjsldfjsdlfj", initialVelocity + "");
 				break;
 			case MotionEvent.ACTION_CANCEL:
 				if (mIsBeingDragged) {

@@ -47,4 +47,8 @@ public class FrgSimpleList extends BaseFragment {
             }
         });
     }
+
+    public String getTitle() {
+        return toolbar.getTitle().toString();
+    }
 }
