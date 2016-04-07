@@ -3,6 +3,7 @@ package com.sun.toy.ux.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.sun.toy.ux.BaseFragment;
 import com.sun.toy.ux.FrgSimpleList;
@@ -10,7 +11,7 @@ import com.sun.toy.ux.FrgSimpleList;
 /**
  * Created by sunje on 2016-02-18.
  */
-public class AdapterFrgSimple extends FragmentPagerAdapter {
+public class AdapterFrgSimple extends FragmentStatePagerAdapter {
     public AdapterFrgSimple(FragmentManager fm) {
         super(fm);
     }
