@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
-    tools:context="sun.toy.SwipeViewActivity">
+    tools:context="com.sun.toy.ux.F2Activity">
 
     <RelativeLayout
         android:id="@+id/view_header"
