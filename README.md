@@ -9,7 +9,7 @@
 
 #추가개발사항
 1. 이유가 분명해야하는 UX적 관점에서 하단 스크롤(drag)이 발생할 수 있음을 인지시켜야 함
-2. 화면이 작아지는 animation추가(원인과 결과를 명확히 해주는 작용)
+2. <b>(완료)</b><s>화면이 작아지는 animation추가(원인과 결과를 명확히 해주는 작용)</s>
 3. 
 
 #기대
@@ -18,7 +18,7 @@
 3. 대화중 다른 대화방으로의 이동과 같이 빠른 화면 전환이 필요한 ui
 
 #화면
-<img src="./screenshots/f2_3.gif" width="240">
+<img src="./screenshots/f2_gif.gif" width="240">
 
 #Licence
 Copyright 2016 Bang Sunje
